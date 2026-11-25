@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://folvi.dpdns.org/</loc><lastmod>2026-11-02</lastmod></url><url><loc>https://folvi.dpdns.org/still/</loc><lastmod>2026-11-02</lastmod></url><url><loc>https://folvi.dpdns.org/still/privacy-policy.html</loc><lastmod>2026-11-02</lastmod></url><url><loc>https://folvi.dpdns.org/buzzpa/</loc><lastmod>2026-11-02</lastmod></url><url><loc>https://folvi.dpdns.org/buzzpa/privacy-policy.html</loc><lastmod>2026-11-02</lastmod></url></urlset>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://folvi.dpdns.org/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://folvi.dpdns.org/still/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://folvi.dpdns.org/buzzpa/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://folvi.dpdns.org/still/privacy-policy.html</loc></url>
+  <url><loc>https://folvi.dpdns.org/still/terms-of-service.html</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://folvi.dpdns.org/buzzpa/privacy-policy.html</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://folvi.dpdns.org/buzzpa/terms-of-service.html</loc><lastmod>2026-11-25</lastmod></url>
+</urlset>
