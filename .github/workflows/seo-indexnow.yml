@@ -1,10 +1,19 @@
 name: SEO validation and IndexNow
 
 on:
-  workflow_run:
-    workflows: ["pages build and deployment"]
-    types: [completed]
+  push:
     branches: [main]
+    paths:
+      - "**/*.html"
+      - "**/*.css"
+      - "**/*.js"
+      - "assets/**"
+      - "sitemap.xml"
+      - "robots.txt"
+      - "CNAME"
+      - "*.txt"
+      - ".github/workflows/seo-indexnow.yml"
+      - ".github/scripts/seo_indexnow.py"
   workflow_dispatch:
 
 permissions:
@@ -13,18 +22,17 @@ permissions:
 
 concurrency:
   group: seo-indexnow
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   validate-and-submit:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 15
     steps:
       - name: Check out deployed revision
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - name: Validate site and submit changed URLs

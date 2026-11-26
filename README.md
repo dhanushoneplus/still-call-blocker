@@ -28,4 +28,4 @@ Application/source changes to Still and Buzzpa are maintained separately; websit
 
 ## Search indexing
 
-The SEO validation and IndexNow workflow runs after a successful GitHub Pages deployment from main. It verifies the public key, sitemap, robots.txt and canonical pages against the deployed revision before notifying IndexNow of changed canonical URLs. A manual run submits all current sitemap URLs for initial setup or recovery. The key file is public by design. Google indexing still uses Search Console and the sitemap; IndexNow acceptance does not guarantee indexing.
+The SEO validation and IndexNow workflow runs on relevant pushes to main and waits for the matching successful GitHub Pages deployment. It verifies the public key, sitemap, robots.txt and canonical pages against the deployed revision before notifying IndexNow of changed canonical URLs. A manual run submits all current sitemap URLs for initial setup or recovery. The key file is public by design. Google indexing still uses Search Console and the sitemap; IndexNow acceptance does not guarantee indexing.

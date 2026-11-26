@@ -56,9 +56,12 @@ class Page(HTMLParser):
         self.in_json = False
         self.data = ""
         self.noindex = False
+        self.missing_alt = []
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if tag == "img" and not attrs.get("alt", "").strip():
+            self.missing_alt.append(attrs.get("src", "(unknown)"))
         if tag == "link" and attrs.get("rel") == "canonical":
             self.canonicals.append(attrs.get("href"))
         if tag == "meta" and attrs.get("name", "").lower() in ("robots", "googlebot", "bingbot"):
@@ -91,6 +94,8 @@ def validate(current):
             raise ValueError(f"Live page differs from deployed revision: {url}")
         page = Page()
         page.feed(body.decode("utf-8"))
+        if page.missing_alt:
+            raise ValueError(f"Missing image alt text: {url}: {page.missing_alt}")
         if page.canonicals != [url] or page.noindex:
             raise ValueError(f"Canonical/indexability check failed: {url}")
         if url in (ROOT + "/still/", ROOT + "/buzzpa/"):
@@ -101,34 +106,43 @@ def validate(current):
         print(f"Validated {url}")
 
 
-def previous_head():
-    run = EVENT.get("workflow_run")
-    if not run:
-        return None
-    endpoint = f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/actions/workflows/{run['workflow_id']}/runs?branch=main&status=success&per_page=50"
+def wait_for_pages():
+    # The managed Pages workflow does not reliably trigger workflow_run.
+    # Match its deployment to the exact pushed revision before submitting.
+    sha = os.environ["GITHUB_SHA"]
+    endpoint = f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/actions/runs?head_sha={sha}&per_page=50"
     headers = {"Authorization": "Bearer " + os.environ["GH_TOKEN"], "Accept": "application/vnd.github+json", "User-Agent": "Get-On-Labs-SEO"}
-    runs = json.loads(get(endpoint, headers))["workflow_runs"]
-    older = [r for r in runs if r["run_number"] < run["run_number"]]
-    if not older:
-        return None
-    return max(older, key=lambda r: r["run_number"])["head_sha"]
+    for attempt in range(40):
+        runs = json.loads(get(endpoint, headers))["workflow_runs"]
+        pages = [r for r in runs if r["name"] == "pages build and deployment" and r["head_sha"] == sha]
+        if pages:
+            latest = max(pages, key=lambda r: r["run_number"])
+            if latest["status"] == "completed":
+                if latest["conclusion"] != "success":
+                    raise RuntimeError(f"Pages deployment failed: {latest['html_url']}")
+                print(f"Pages deployment succeeded: {latest['html_url']}")
+                return
+        print("Waiting for Pages deployment...", flush=True)
+        time.sleep(15)
+    raise RuntimeError("Timed out waiting for matching Pages deployment")
 
 
 def changed_urls(current):
-    previous = previous_head()
-    if not previous:
+    previous = EVENT.get("before")
+    if not previous or previous == "0" * 40:
         return current
     try:
         old = urls(git("show", previous + ":sitemap.xml"))
         changes = set(git("diff", "--name-only", "-z", previous, "HEAD").decode().strip("\0").split("\0"))
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, ValueError):
         return current
-    if KEY + ".txt" in changes or any(p.startswith("assets/") for p in changes):
+    if any(p.startswith(("assets/", ".github/")) or p == KEY + ".txt" for p in changes):
         return current | old
     return (current ^ old) | {u for u in current | old if file_path(u) in changes}
 
 
 def main():
+    wait_for_pages()
     current = urls(Path("sitemap.xml").read_bytes())
     for attempt in range(5):
         try:
