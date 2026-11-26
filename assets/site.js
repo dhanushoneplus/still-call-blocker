@@ -12,7 +12,9 @@
 
   const fallback = `https://play.google.com/store/apps/details?id=${packageByApp[app]}`;
   const intent = `intent://details?id=${packageByApp[app]}#Intent;scheme=market;package=com.android.vending;S.browser_fallback_url=${encodeURIComponent(fallback)};end`;
-  window.location.replace(intent);
+  const openPlayStore = () => window.setTimeout(() => window.location.replace(intent), 800);
+  if (document.readyState === 'complete') openPlayStore();
+  else window.addEventListener('load', openPlayStore, {once: true});
 })();
 
 document.querySelectorAll('[data-copy-email]').forEach(button => {
