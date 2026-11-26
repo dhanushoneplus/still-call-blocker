@@ -1,3 +1,20 @@
+(() => {
+  const packageByApp = {
+    still: 'com.gol.stillcallblocker',
+    buzzpa: 'com.gol.buzzpa.pro'
+  };
+  const app = document.body.dataset.app;
+  const normalizedPath = window.location.pathname.replace(/index\.html$/, '').replace(/\/+$/, '/') || '/';
+  const isAppLandingPage = app && normalizedPath === `/${app}/`;
+  const isInstagramAndroid = /Instagram/i.test(navigator.userAgent || '') && /Android/i.test(navigator.userAgent || '');
+
+  if (!isAppLandingPage || !isInstagramAndroid || !packageByApp[app]) return;
+
+  const fallback = `https://play.google.com/store/apps/details?id=${packageByApp[app]}`;
+  const intent = `intent://details?id=${packageByApp[app]}#Intent;scheme=market;package=com.android.vending;S.browser_fallback_url=${encodeURIComponent(fallback)};end`;
+  window.location.replace(intent);
+})();
+
 document.querySelectorAll('[data-copy-email]').forEach(button => {
   button.addEventListener('click', async () => {
     const status = button.closest('.support-contact').querySelector('.email-status');
