@@ -15,3 +15,7 @@
 /* Shared legal typography and Buzzpa product screenshots. */
 .policy li{color:var(--muted);font-size:15px;overflow-wrap:anywhere;margin-bottom:8px}.buzzpa-visual img{max-height:460px;width:auto;object-fit:contain}.buzzpa-visual{border-color:#e3daed}.buzzpa-visual figcaption{color:var(--muted)}
 @media(max-width:900px){.buzzpa-visual img{max-height:410px}}@media(max-width:650px){.buzzpa-visual img{max-height:430px}}
+
+/* Buzzpa uses the same carousel shell and controls as Still, with its own palette.
+   Preserve the full 9:16 screenshots instead of cropping them to Still's 9:20 ratio. */
+.buzzpa-visual .carousel-viewport{background:#e8e0f0}.buzzpa-visual .carousel-slide img{width:100%;aspect-ratio:9/16;object-fit:contain;object-position:center;background:#f9f6fc}.buzzpa-visual .carousel-arrow{border-color:#d4c6e5}.buzzpa-visual .carousel-dots button{background:#cbbbdc}.buzzpa-visual .carousel-dots button[aria-current=true]{background:var(--accent)}.buzzpa-visual.app-carousel:focus-within{box-shadow:0 24px 45px -32px #47306155,0 0 0 2px #73509c26}

@@ -103,6 +103,33 @@ def validate(current):
             apps = [node for node in graph if node.get("@type") == "MobileApplication"]
             if len(apps) != 1 or apps[0].get("url") != url or not apps[0].get("installUrl", "").startswith("https://play.google.com/store/apps/details?id="):
                 raise ValueError(f"Application JSON-LD check failed: {url}")
+        if url in (ROOT + "/", ROOT + "/still/", ROOT + "/buzzpa/"):
+            # Validate the dedicated social preview asset and its declared dimensions.
+            import re
+            import struct
+            html = body.decode("utf-8")
+            og = re.findall(r'<meta property="og:image" content="([^"]+)">', html)
+            if len(og) != 1 or not og[0].startswith(ROOT + "/assets/og-"):
+                raise ValueError(f"Missing dedicated Open Graph image: {url}")
+            if '<meta property="og:image:width" content="1200">' not in html or '<meta property="og:image:height" content="630">' not in html:
+                raise ValueError(f"Invalid Open Graph dimensions metadata: {url}")
+            if '<meta name="twitter:card" content="summary_large_image">' not in html or '<meta name="robots" content="max-image-preview:large">' not in html:
+                raise ValueError(f"Missing large image preview metadata: {url}")
+            png = get(og[0])
+            if not png.startswith(b"\x89PNG\r\n\x1a\n") or struct.unpack(">II", png[16:24]) != (1200, 630):
+                raise ValueError(f"Invalid Open Graph PNG asset: {og[0]}")
+            print(f"Validated social preview {og[0]}")
+        if url == ROOT + "/buzzpa/":
+            import re
+            screenshots = re.findall(r'<div class="carousel-slide"[^>]*><img src="([^"]+)"', body.decode("utf-8"))
+            if len(screenshots) != 3 or len(set(screenshots)) != 3:
+                raise ValueError("Buzzpa carousel must contain three distinct screenshots")
+            for screenshot in screenshots:
+                if not screenshot.startswith("/assets/buzzpa-"):
+                    raise ValueError(f"Unexpected Buzzpa screenshot: {screenshot}")
+                if not get(ROOT + screenshot).startswith(b"\x89PNG\r\n\x1a\n"):
+                    raise ValueError(f"Invalid Buzzpa screenshot: {screenshot}")
+            print("Validated all three Buzzpa carousel images")
         print(f"Validated {url}")
 
 
