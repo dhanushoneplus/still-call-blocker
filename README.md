@@ -25,3 +25,7 @@ Keep privacy policies separate. Never replace the legacy root policy with a comp
 Use local assets and system fonts. The email-copy button only copies the public support address; email links open the user's own email service and never send automatically.
 
 Application/source changes to Still and Buzzpa are maintained separately; website-only updates do not require rebuilding Android app bundles.
+
+## Search indexing
+
+The SEO validation and IndexNow workflow runs after a successful GitHub Pages deployment from main. It verifies the public key, sitemap, robots.txt and canonical pages against the deployed revision before notifying IndexNow of changed canonical URLs. A manual run submits all current sitemap URLs for initial setup or recovery. The key file is public by design. Google indexing still uses Search Console and the sitemap; IndexNow acceptance does not guarantee indexing.
