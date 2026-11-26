@@ -7,8 +7,9 @@
   const normalizedPath = window.location.pathname.replace(/index\.html$/, '').replace(/\/+$/, '/') || '/';
   const isAppLandingPage = app && normalizedPath === `/${app}/`;
   const isInstagramAndroid = /Instagram/i.test(navigator.userAgent || '') && /Android/i.test(navigator.userAgent || '');
+  const playTest = new URLSearchParams(window.location.search).get('play_test') === '1';
 
-  if (!isAppLandingPage || !isInstagramAndroid || !packageByApp[app]) return;
+  if (!isAppLandingPage || (!isInstagramAndroid && !playTest) || !packageByApp[app]) return;
 
   const fallback = `https://play.google.com/store/apps/details?id=${packageByApp[app]}`;
   const intent = `intent://details?id=${packageByApp[app]}#Intent;scheme=market;package=com.android.vending;S.browser_fallback_url=${encodeURIComponent(fallback)};end`;
